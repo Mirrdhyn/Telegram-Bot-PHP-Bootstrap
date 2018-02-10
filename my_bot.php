@@ -137,6 +137,10 @@
 
 		switch($update["callback_query"]["data"]) {
 			case '1':
+				apiRequest("editMessageText",array('chat_id' => CHAT_ROOT,
+					'message_id' => $MessageId,
+					'parse_mode' => 'HTML',
+					'text' => "<b>New text message</b>"));
 				break;
 			case '2':
 				break;
