@@ -119,9 +119,9 @@
 					'parse_mode' => 'HTML',
 					'text' => "Hello ".$FromUserTG."! How can I help you today?",
 					'reply_markup' => array('inline_keyboard' => array(
-						array(['text' => " Test 1 ", 'callback_data' => "1",'text' => " Test 2 ", 'callback_data' => "2"],['text' => " Test 3 ", 'callback_data' => "3",'text' => " Test 4 ", 'callback_data' => "4"])))));
+						array(['text' => " Test 1 ", 'callback_data' => "1"],['text' => " Test 2 ", 'callback_data' => "2"]),array(['text' => " Test 3 ", 'callback_data' => "3",'text' => " Test 4 ", 'callback_data' => "4"])))));
 						//You will get this kind of inline_keyboard under your message above [ Test 1 ] [ Test 2 ]
-						//                                                                   [ Test 3 ] [ Test 4 ]
+						//    an array add a new line and a couple of [] add a button        [ Test 3 ] [ Test 4 ]
 				break;
 			default:
 				//In case this is not a / command but just a message
