@@ -12,12 +12,12 @@
 		exit;
 	}
 
-	$tg_id_enl = array(1234); //List of Telegram ID
-	if (isset($update['message']['from']['id']) and in_array($update['message']['from']['id'],$tg_id_enl)) {
+	$tg_id = array(1234,5678); //List of Telegram ID you want to blacklist
+	if (isset($update['message']['from']['id']) and in_array($update['message']['from']['id'],$tg_id)) {
 		exit; //Blacklist them directly
 	}
 
-	if(isset($update["inline_query"]["from"]["id"]) and in_array($update["inline_query"]["from"]["id"],$tg_id_enl)) {
+	if(isset($update["inline_query"]["from"]["id"]) and in_array($update["inline_query"]["from"]["id"],$tg_id)) {
 		exit; //and now for inline search as well
 	}
 
@@ -33,9 +33,11 @@
 
 		//Do some things with the location shared by your user
 		//You can, for instance, lookup for real time informations nearby
-
+		$db->close();
 		exit;
-	}  elseif(isset($update["message"]["entities"]) and (strcmp($update["message"]["entities"][0]["type"],"bot_command") !== 0) and (strcmp($update["message"]["entities"][0]["type"],"hashtag") !== 0)) {
+	}
+
+	if(isset($update["message"]["entities"]) and (strcmp($update["message"]["entities"][0]["type"],"bot_command") !== 0) and (strcmp($update["message"]["entities"][0]["type"],"hashtag") !== 0)) {
 		//Here, you can lookup for URL in message.
 		$message = $update["message"];
 		$chatId = $message["chat"]["id"];
@@ -65,7 +67,9 @@
 			//Do things with your link here
 		}
 		exit;
-	} elseif (isset($update["message"]["photo"])) { //If you would like to catch pic and do something on
+	}
+
+	if(isset($update["message"]["photo"])) { //If you would like to catch pic and do something on
 			$chatId = $update["message"]["chat"]["id"];
 			$FromUserTG = $update["message"]["from"]["username"];
 		if (isset($update["message"]["caption"])) { //If the pic has a caption
@@ -119,15 +123,20 @@
 					'parse_mode' => 'HTML',
 					'text' => "Hello ".$FromUserTG."! How can I help you today?",
 					'reply_markup' => array('inline_keyboard' => array(
-						array(['text' => " Test 1 ", 'callback_data' => "1"],['text' => " Test 2 ", 'callback_data' => "2"]),array(['text' => " Test 3 ", 'callback_data' => "3"],['text' => " Test 4 ", 'callback_data' => "4"])))));
+						array(['text' => " Test 1 ", 'callback_data' => "1"],['text' => " Test 2 ", 'callback_data' => "2"]),
+						array(['text' => " Test 3 ", 'callback_data' => "3"],['text' => " Test 4 ", 'callback_data' => "4"])))));
 						//You will get this kind of inline_keyboard under your message above [ Test 1 ] [ Test 2 ]
 						//    an array add a new line and a couple of [] add a button        [ Test 3 ] [ Test 4 ]
 				break;
 			default:
 				//In case this is not a / command but just a message
 				//str_cmp words for instance
-			exit;
-	} else if(isset($update["callback_query"])) { //when user click on inline_keyboard
+		}
+		$db->close();
+		exit;
+	}
+
+	if(isset($update["callback_query"])) { //when user click on inline_keyboard
 		$chatId = $update["callback_query"]["message"]["chat"]["id"];
 		$MessageId = $update["callback_query"]["message"]["message_id"];
 		$callback_query_Id = $update["callback_query"]["id"];
@@ -151,16 +160,19 @@
 			default: //You can add more data in your callback to identify some specific use cases
 
 		}
-	} elseif(isset($update["inline_query"])) {
+		exit;
+	}
+
+	if(isset($update["inline_query"])) {
 		mb_internal_encoding("UTF-8");
 		$QueryId = $update["inline_query"]["id"];
 		$usernameTG = $update["inline_query"]["from"]["username"];
 		$chatId = $update["inline_query"]["from"]["id"];
 		$OffsetQuery = $update["inline_query"]["offset"];
 
-		$TexteQuery = $db->real_escape_string(str_replace("’","'",$update["inline_query"]["query"]));
-
 		if(isset($TexteQuery) and $TexteQuery != "") { //Treat this only if user types some letters. Avoid empty request...
+			$db = init_acces();
+			$TexteQuery = $db->real_escape_string(str_replace("’","'",$update["inline_query"]["query"]));
 			$next_offset = intval($OffsetQuery)+30;
 			$request_some_stuff = "SELECT some, stuff FROM your_database WHERE this LIKE ? ORDER BY that ASC LIMIT 30 OFFSET ".intval($OffsetQuery);
 
@@ -210,7 +222,7 @@
 					$ListeToDisplay = array();
 					$ListeResuls = array();
 					while($my_result = $result->fetch_row()) {
-						$imgPortail = ($my_result[3] == 'null') ? "https://my.link/default-portal-image.png" : $my_result[3];
+						$imgPortail = ($my_result[3] == 'null') ? "https://my.link/my-image.png" : $my_result[3];
 						//$IndexListePortails += 1;
 						$ListeToDisplay = array('type' => 'venue', 'id' => strval($my_result[5]),
 							'latitude' => floatval($my_result[1]),
@@ -228,6 +240,7 @@
 						'next_offset' => strval($next_offset)));
 					break;
 			}
+			$db->close();
 		}
 	}
 ?>

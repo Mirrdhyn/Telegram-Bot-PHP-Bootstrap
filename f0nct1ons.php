@@ -1,4 +1,12 @@
 <?php
+function init_acces() {
+	// Your MySQL/PostGre connection function and return the file descriptor
+	// example :
+	// $acces = mysqli_connect(HOST, USER, PASSWORD, DATABASE, PORT);
+	// $acces->query("set names 'utf8'");
+  // return $acces;
+}
+
 function exec_curl_request($handle,$url) {
 	$response = curl_exec($handle);
 
